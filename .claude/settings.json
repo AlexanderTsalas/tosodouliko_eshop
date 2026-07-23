@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(xargs grep *)",
+      "Bash(echo \"TSC_EXIT=$?\")",
+      "Bash(grep -n \"RuleCard{$\\\\|<CardShell onClick={onSelect}>\" src/components/admin/offers/OffersLabBench.tsx)",
+      "Bash(ls src/app/admin/orders/)",
+      "Bash(find src/app/admin/orders -name \"page.tsx\")",
+      "Bash(/products/\" src/components --include=\"*.tsx\" | head -10)",
+      "Bash(grep -rln \"href={`/products/\" src/components --include=\"*.tsx\" | head -10)",
+      "Bash(node scripts/sweep-phase-markers.mjs --apply)",
+      "Bash(xargs head -3)",
+      "Bash(xargs -I {} sh -c 'echo \"=== {} ===\" && head -20 \"{}\"')",
+      "Bash(node scripts/sweep-admin-layout.mjs)",
+      "Bash(node scripts/sweep-admin-layout.mjs --apply)",
+      "Bash(node scripts/probe-spec-resolver.mjs)",
+      "Bash(node scripts/probe-phase-0.mjs)",
+      "Bash(command -v docker)",
+      "Bash(docker --version)",
+      "Bash(echo \"docker: $\\(docker --version\\)\")",
+      "Bash(command -v k6)",
+      "Bash(k6 version *)",
+      "Bash(docker exec *)",
+      "Bash(git commit -m ' *)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\dimitris\\.claude\\projects\\c--Users-dimitris-Documents-GitHub-kids-eshop\\memory"
+    ]
+  }
+}

@@ -1,0 +1,838 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.5rem;
+
+    /* Admin bottom-dock surface palette. The dock is an intentionally dark
+       "chrome" element (a floating Apple-Dock-style bar) that does NOT follow
+       the light/dark page tokens above — it is dark on every theme. These
+       defaults reproduce the original hardcoded stone/white look 1:1; override
+       them per-brand to re-tint the whole dock without touching the component.
+       Consumed via the `dock*` Tailwind colors (bg-dock, text-dock-foreground,
+       ring-dock-ring, ring-offset-dock, …), which carry an <alpha-value> slot
+       so opacity modifiers (bg-dock/95, text-dock-foreground/40) work. */
+    --dock:            24 10% 10%;   /* stone-900 — bar / popover / tooltip surface */
+    --dock-elevated:   30  6% 25%;   /* stone-700 — collapse/expand toggle tile      */
+    --dock-muted:      30  6% 33%;   /* stone-600 — muted (permission-thin) section  */
+    --dock-active:     25  5% 45%;   /* stone-500 — section / link / active tiles    */
+    --dock-foreground:  0  0% 100%;  /* white — icons, labels, dividers, overlays    */
+    --dock-ring:        0  0% 100%;  /* white — focus + active-state rings           */
+
+    /* Semantic tokens for contention/inventory UI. Override per-brand
+       to change the visual language of wait-state badges, stock status
+       indicators, and out-of-stock overlays without editing components. */
+    --badge-waiting: 48 96% 89%;          /* amber-100 */
+    --badge-waiting-text: 26 90% 37%;     /* amber-900 */
+    --badge-waiting-border: 45 93% 47%;   /* amber-300 */
+    --badge-promoted: 142 76% 94%;        /* emerald-100 */
+    --badge-promoted-text: 155 79% 31%;   /* emerald-900 */
+    --badge-oos-overlay: 0 0% 9% / 0.85;  /* neutral-900/85 */
+    --badge-oos-text: 0 0% 100%;          /* white */
+
+    /* Offer-engine storefront badges (Phase 3). One color per rule kind
+       so the customer can scan an offer's nature at a glance. Stock-
+       threshold rules override to the "low stock" color since the urgency
+       signal matters more than the discount-flavour. */
+    --badge-discount:        0 70% 50%;        /* red-600 — % / flat discount */
+    --badge-discount-text:   0 0% 100%;        /* white */
+    --badge-bundle:          262 60% 50%;      /* violet-600 — BXGY */
+    --badge-bundle-text:     0 0% 100%;
+    --badge-shipping:        152 60% 38%;      /* emerald-600 — free shipping */
+    --badge-shipping-text:   0 0% 100%;
+    --badge-cod:             217 70% 50%;      /* blue-600 — no COD fees */
+    --badge-cod-text:        0 0% 100%;
+    --badge-low-stock:       28 90% 50%;       /* orange-600 — last items */
+    --badge-low-stock-text:  0 0% 100%;
+
+    /* Stock status accent colors — kept for any non-badge surfaces
+       that want to pull the same hue (e.g. an inventory chart). The
+       stock-chip itself uses Tailwind's emerald/amber/red utility
+       palette directly for guaranteed AA contrast. */
+    --stock-ok:  152 69% 31%;              /* emerald-600 */
+    --stock-low:  38 92% 50%;              /* amber-500   */
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Larger, more-clickable checkboxes everywhere. Default browser
+     checkboxes render at ~13×13 which is hard to hit and hard to see
+     the tick. 18×18 is the WCAG-recommended minimum touch target step
+     and reads cleanly at all sidebar/table sizes.
+     accent-color anchors the checked-state color to the design system
+     foreground (near-black) instead of the browser's blue default. */
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: hsl(var(--foreground));
+  }
+  input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+  }
+}
+
+/* =========================================================================
+ * Admin/CMS component utilities. Black-and-white visual language —
+ * borders, hover-states, no chroma. Apply per-element via class names
+ * (e.g. `<button class="btn btn-primary btn-md">`) to get a consistent
+ * look across admin pages without per-component prop drilling. Pages
+ * that still use raw Tailwind utility chains keep working; these
+ * classes are additive, not enforced.
+ * ========================================================================= */
+@layer components {
+  /* --- Page-to-page navigation fade-in --------------------------------
+     Used by PageTransitionWrapper to give a fade-in on every page
+     navigation. The wrapper keys the page content by pathname, so
+     each navigation remounts the keyed div and fires this animation.
+     Layout chrome (sidebar, header) stays mounted and doesn't
+     transition.
+
+     Pure opacity — no Y translation. The longer the duration, the
+     more loads complete within the animation window and are
+     masked by the fade-in. 300ms is a reasonable balance: long
+     enough to mask the typical loading state, short enough to
+     not feel sluggish on instant-from-cache navigations.
+
+     Note: no fade-out on the outgoing page. Doing that correctly
+     requires either intercepting Link clicks to delay router.push,
+     or using the browser View Transitions API. See the comment
+     header in PageTransitionWrapper.tsx for the rationale. */
+  @keyframes page-enter {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .page-enter {
+    animation: page-enter 300ms ease-out;
+  }
+
+  /* Accessibility — honor the OS-level reduced-motion preference. */
+  @media (prefers-reduced-motion: reduce) {
+    .page-enter {
+      animation-duration: 1ms !important;
+    }
+  }
+
+  /* --- Content fade-in -----------------------------------------------
+     Used on the DATA-bearing parts of pages (table tbody, card
+     grids, list containers) — NOT on the surrounding chrome
+     (PageHeader, toolbar, table thead, filter form). Chrome is
+     identical between loading.tsx and the live page so it appears
+     stable across the swap; only the actual rows/items need to
+     fade in.
+
+     Apply with `className="content-reveal"` on the specific
+     element whose mounted children replace the skeleton's
+     placeholders — typically `<tbody>` for tables or the grid
+     container for card layouts. The earlier `.content-enter`
+     attempt wrapped the whole live component (toolbar included),
+     which made identical chrome re-fade after every Suspense
+     resolve. Scoping tighter avoids that. */
+  @keyframes content-reveal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .content-reveal {
+    animation: content-reveal 300ms ease-out;
+  }
+
+  /* --- Skeleton delayed fade-in --------------------------------------
+     Used on the SKELETON parts of loading states (card placeholders,
+     table row cells) — NOT on chrome (page header, search bar, filter
+     buttons, column titles). Those should paint immediately.
+
+     The 150ms delay means fast loads (under ~150ms) never show the
+     skeleton at all — chrome paints, data arrives, real content
+     replaces the still-invisible skeleton with no visual flicker.
+     Slow loads (>300ms) see the skeleton fade in gracefully.
+
+     Compose alongside `animate-pulse` — the pulse runs continuously,
+     the fade-in runs once on mount. The mounting order is:
+       0-150ms: invisible (delay)
+       150-300ms: fading in (animation duration)
+       300ms+: fully visible, pulsing */
+  @keyframes skeleton-reveal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .skeleton-reveal {
+    opacity: 0;
+    animation: skeleton-reveal 150ms ease-out 150ms forwards;
+  }
+  /* --- Storefront product card ---------------------------------------
+     ONE width for the product/variant tile, everywhere it appears
+     (catalog grid, related-products carousels, anywhere else). No
+     wrapper should override this — adjust HERE if size changes. */
+  .storefront-product-card {
+    width: 13rem;
+    flex: 0 0 auto;
+  }
+  /* --- Buttons -------------------------------------------------------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md
+           text-sm font-medium transition-colors whitespace-nowrap
+           disabled:opacity-50 disabled:pointer-events-none
+           focus-visible:outline-none focus-visible:ring-2
+           focus-visible:ring-foreground/40 focus-visible:ring-offset-2
+           focus-visible:ring-offset-background;
+  }
+  .btn-sm { @apply h-7 px-2.5 text-xs gap-1; }
+  .btn-md { @apply h-9 px-3.5; }
+  .btn-lg { @apply h-10 px-4 text-base; }
+  .btn-icon { @apply h-9 w-9 p-0; }
+  .btn-icon-sm { @apply h-7 w-7 p-0; }
+
+  .btn-primary {
+    @apply border border-foreground bg-foreground text-background
+           hover:bg-foreground/90;
+  }
+  .btn-secondary {
+    @apply border border-foreground/25 bg-background text-foreground
+           hover:border-foreground hover:bg-muted/40;
+  }
+  .btn-ghost {
+    @apply text-foreground hover:bg-muted/50;
+  }
+  .btn-destructive {
+    @apply border border-foreground/20 text-foreground
+           hover:border-destructive hover:bg-destructive/10 hover:text-destructive;
+  }
+
+  /* --- Cards / surfaces ---------------------------------------------- */
+  /* Base card — used for stat tiles, list-item cards, dashboard widgets.
+     White bg + subtle shadow to pop slightly off the page background. */
+  .cms-card {
+    @apply rounded-lg border border-foreground/10 bg-card p-4 sm:p-5
+           shadow-[0_1px_2px_rgba(0,0,0,0.04)];
+  }
+  /* Section variant — same shape as cms-card but with a more pronounced
+     grey hue + soft shadow so each conceptual section reads as a
+     distinct surface against the page bg. Used on long edit pages
+     where multiple sections stack vertically (product overview etc).
+     bg-muted/70 is dark enough to clearly separate from page bg
+     (which is bg-background) without becoming distracting. */
+  .cms-card-section {
+    @apply rounded-xl border border-foreground/10 bg-muted/70 p-5 sm:p-6
+           shadow-[0_1px_2px_rgba(0,0,0,0.05),0_2px_10px_rgba(0,0,0,0.06)];
+  }
+  /* Global rule for metric-tile / stat-tile cards: never stretch
+     vertically to match siblings. The default CSS Grid + Flex item
+     behavior is `align-items: stretch`, which makes a card in a row
+     of cards inherit the tallest sibling's height — producing the
+     "twice the size of contents" whitespace problem. Force every
+     card-style surface to size to its own content. Containers that
+     need equal heights can opt back in via `items-stretch` on the
+     parent grid/flex. */
+  .cms-card,
+  .cms-card-section {
+    align-self: start;
+  }
+
+  /* Reusable section-header block: dark title + helper paragraph +
+     hairline divider underneath. Apply on the <header> element of
+     any cms-card-section so titles read clearly and the separator
+     splits header from body content. */
+  .cms-section-header {
+    @apply pb-3 mb-4 border-b border-foreground/15;
+  }
+  .cms-section-header h2,
+  .cms-section-title {
+    @apply text-base font-semibold uppercase tracking-wide text-foreground;
+  }
+  .cms-section-header p,
+  .cms-section-desc {
+    @apply text-sm text-foreground/70 mt-1.5;
+  }
+  .cms-section {
+    @apply space-y-3;
+  }
+
+  /* --- Page header ---------------------------------------------------- */
+  .cms-page-header {
+    @apply flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between
+           pb-4 mb-6 border-b border-foreground/10;
+  }
+  .cms-page-title {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+  .cms-page-description {
+    @apply mt-1 text-sm text-muted-foreground max-w-2xl;
+  }
+
+  /* --- Tables --------------------------------------------------------- */
+  /* Robust column alignment: border-collapse:separate + border-spacing:0
+     keeps headers and cells edge-aligned reliably (the default `collapse`
+     mode lets adjacent cell borders interact in ways that produce
+     subpixel shifts in some browsers). Both <th> and <td> get identical
+     px-3 py-2.5 padding + align-middle so a header's left/right edge
+     ALWAYS lands at the same column-x as the data below it. */
+  .cms-table-wrap {
+    @apply border border-foreground/10 rounded-lg overflow-hidden;
+  }
+  .cms-table {
+    @apply w-full text-sm;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .cms-table thead tr {
+    @apply bg-muted text-xs uppercase tracking-wide text-muted-foreground;
+  }
+  /* DEFAULT cell alignment is CENTER for both <th> and <td>. Header
+     center and data center sit at the same x so the column reads as
+     "stacked content" without per-column intervention. Columns that
+     should read left-aligned (product name, slug, email, description)
+     opt out by adding `text-left` to BOTH th and td. */
+  .cms-table thead th {
+    @apply text-center font-medium align-middle;
+    /* Slightly taller header than the data rows (which keep 0.625rem);
+       horizontal padding stays 0.75rem so column edges still align. */
+    padding: 0.875rem 0.75rem;
+  }
+  .cms-table tbody tr {
+    @apply hover:bg-muted/20 transition-colors;
+  }
+  /* Row separators via border on td so we can't introduce row-wide bg
+     interactions with td-level state changes. Skip the first row's
+     top border so the header doesn't get a double divider. */
+  .cms-table tbody tr td {
+    @apply text-center align-middle;
+    padding: 0.625rem 0.75rem;
+    border-top: 1px solid hsl(var(--foreground) / 0.1);
+  }
+  .cms-table tbody tr:first-child td {
+    border-top: none;
+  }
+
+  /* ──── Clickable-row pattern ──────────────────────────────────────
+     Apply `.cms-row-link` to a <tr> + add `<Link className="cms-row-link-target">`
+     inside ONE cell to make the entire row navigate on click while
+     preserving middle-click / ⌘-click / right-click / keyboard semantics.
+     Interactive cells (checkboxes, buttons, kebab menus) inside the row
+     must be marked with `data-row-action` so they stack above the
+     stretched link and receive clicks. */
+  .cms-table tbody tr.cms-row-link {
+    cursor: pointer;
+  }
+  .cms-table tbody tr.cms-row-link:hover {
+    @apply bg-muted/40;
+  }
+  /* The Link's ::before pseudo-element extends the click target
+     across the entire row (the parent <tr> is position:relative via
+     the implicit row-link styles). z-index 0 keeps it below any
+     element marked data-row-action. */
+  .cms-row-link {
+    position: relative;
+    /* Local stacking context ONLY for the stretched-link pseudo
+       (::before z-0) and action cells (z-1). Must stay low — below the
+       bottom dock (z-50), modals (z-50+) and the product panel
+       (backdrop z-55 / aside z-60). A higher value (it was once 56 to
+       "punch through" the panel backdrop) makes rows paint over those
+       overlays and steal their pointer events. */
+    z-index: 0;
+  }
+  .cms-row-link-target {
+    position: static;
+  }
+  .cms-row-link-target::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  /* Action cells (buttons, checkboxes) — stack above the stretched
+     link so they receive clicks. Position must be set explicitly
+     because the pseudo-element above is itself absolutely positioned. */
+  .cms-row-link [data-row-action] {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ──── Row "punch-through" while the product panel is open ─────────
+     When the side panel is open, EVERY row lifts above the panel
+     backdrop (z-55) — because a row left at z-0 below the
+     pointer-capturing backdrop can never receive :hover (the backdrop
+     eats the pointer first), so it could never "wake". 56 sits below
+     the aside (z-60) and the bulk-confirm modal (z-70), so the panel
+     chrome stays on top.
+
+     Clear vs. receded is done with OPACITY, not z-index: the focused
+     row (.cms-row-elevated) and the hovered row stay fully opaque and
+     clickable (switch product without closing); the rest are dimmed so
+     attention stays on the panel.
+
+     CRUCIAL: these classes are applied by ProductTableRow ONLY while
+     the panel is open. With the panel closed, rows stay at z-0 (below
+     the dock + modals), so the closed-state layering is unaffected. */
+  .cms-table tbody tr.cms-row-link.cms-row-elevatable {
+    z-index: 56;
+  }
+  .cms-table
+    tbody
+    tr.cms-row-link.cms-row-elevatable:not(.cms-row-elevated):not(:hover) {
+    opacity: 0.45;
+  }
+  .cms-table tbody tr.cms-row-link.cms-row-elevatable:hover {
+    /* Opaque background so the woken row reads fully clear over the
+       dimmed backdrop behind it. */
+    background-color: hsl(var(--card));
+  }
+
+  /* ──── Universal row separators for AD-HOC <table>s ─────────────
+     Tables that don't use .cms-table still get a hairline divider
+     between data rows. Lower specificity than the cms-table rule
+     above so cms-table tables aren't double-bordered. `tr + tr > td`
+     selects td of every tr that follows another tr — every row
+     except the first. */
+  table:not(.cms-table) tbody tr + tr > td {
+    border-top: 1px solid hsl(var(--foreground) / 0.1);
+  }
+
+  /* ──── Reusable accordion — same animation as the sidebar ────────
+     Apply `.cms-accordion` to a content wrapper that should expand
+     smoothly when open. Toggle the `.is-open` class on the SAME
+     element to animate.
+
+     Mechanics: grid-template-rows transitions from 0fr → 1fr, which
+     animates against the natural content height (unlike max-height
+     which always animates against the static cap). Opacity fades in
+     parallel so any sub-pixel residual during transition is invisible.
+     The inner content element needs `min-height: 0; overflow: hidden`
+     so it can truly collapse to 0px; we apply those to direct
+     children via `> *` so consumers don't have to.
+
+     Example:
+       <div className={`cms-accordion ${open ? "is-open" : ""}`}>
+         <div>...content...</div>
+       </div>
+
+     For HTML <details>, use the cms-accordion-details variant below. */
+  .cms-accordion {
+    display: grid;
+    grid-template-rows: 0fr;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      grid-template-rows 220ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .cms-accordion.is-open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .cms-accordion > * {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* Native <details> variant. `<details>` toggles display:block/none
+     internally on its inner element, which can't be animated. We work
+     around this by keeping the inner content always rendered and
+     animating its size via grid-rows the same way as cms-accordion.
+     Mark the content wrapper with `.cms-accordion-body` and the
+     <details> element with `.cms-accordion-details`. */
+  details.cms-accordion-details > .cms-accordion-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      grid-template-rows 220ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  details.cms-accordion-details[open] > .cms-accordion-body {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  details.cms-accordion-details > .cms-accordion-body > * {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* --- Bulk action bar (single source of truth) ----------------------
+     Appears above tables / inside editors whenever the operator has
+     selected one or more rows. Same visual language everywhere in the
+     admin (products list, inventory, variants table, supply orders,
+     etc.) so the affordance is instantly recognisable.
+
+     Layout: one flex-wrap row containing the "N επιλεγμένες" label +
+     every action button + every inline numeric setter. Items flow
+     left-to-right and wrap as a single line — there is NO inner
+     divider that forces inputs onto a second row when the top row
+     still has space. */
+  .cms-bulk-bar {
+    @apply rounded-md border border-foreground/20 bg-muted/60
+           px-3 py-2 mb-3
+           flex flex-wrap items-center gap-x-3 gap-y-2;
+  }
+  /* Label inside the bar — sits at the left, slightly stronger weight
+     than the surrounding action buttons. */
+  .cms-bulk-bar-label {
+    @apply text-sm font-medium mr-auto;
+  }
+  /* "Clear selection" affordance — terminal link styling, lives at
+     the right of the bar via mr-auto on the label. */
+  .cms-bulk-bar-clear {
+    @apply text-xs text-muted-foreground hover:text-foreground underline px-2;
+  }
+
+  /* --- Status badge --------------------------------------------------- */
+  .cms-badge {
+    @apply inline-flex items-center gap-1.5 rounded-full border
+           px-2 py-0.5 text-[11px] font-medium;
+  }
+  .cms-badge-neutral {
+    @apply border-foreground/25 bg-background;
+  }
+  .cms-badge-muted {
+    @apply border-foreground/15 bg-muted text-muted-foreground;
+  }
+  .cms-badge-dot {
+    @apply inline-block w-1.5 h-1.5 rounded-full bg-foreground;
+  }
+  .cms-badge-dot-muted {
+    @apply inline-block w-1.5 h-1.5 rounded-full bg-muted-foreground/40;
+  }
+
+  /* --- Form inputs ---------------------------------------------------- */
+  .cms-input {
+    @apply h-9 w-full rounded-md border border-foreground/20 bg-background
+           px-3 text-sm transition-colors
+           placeholder:text-muted-foreground
+           focus-visible:outline-none focus-visible:border-foreground
+           focus-visible:ring-2 focus-visible:ring-foreground/15
+           disabled:opacity-50;
+  }
+  .cms-input-sm { @apply h-7 px-2 text-xs; }
+
+  /* --- Empty state ---------------------------------------------------- */
+  .cms-empty {
+    @apply border border-dashed border-foreground/20 rounded-lg
+           px-6 py-10 text-center text-sm text-muted-foreground;
+  }
+
+  /* --- Sub-tab navigation (single source of truth) -------------------- */
+  /* Global sub-tab pattern. Renders inside detail pages (product edit,
+     customer edit, supplier orders workspace, courier settings, etc).
+     Visual:
+       - Container: hairline border-bottom + small gap between tabs
+       - Inactive tab: muted-foreground text, transparent background,
+         soft hover state that hints at the resting active treatment
+       - Active tab: foreground text + soft bg-tinted background +
+         2px foreground underline that overlaps the strip border
+       - Optional count badge (.cms-tab-count) adopts active/inactive
+         color via its placement inside an active/inactive parent
+     Replaces the previous in-component class soup so every sub-tab
+     across the admin stays in sync via one CSS rule.
+  */
+  /* Tab strip — hairline below separates the strip from the content
+     area. No top/bottom decorations on the strip itself; the active
+     tab carries its own visual weight via bg + shadow (see below). */
+  .cms-tabs {
+    @apply border-b border-foreground/15 mb-6 flex flex-wrap gap-1;
+  }
+  .cms-tab {
+    /* Bookmark-style tab affordance. Top corners rounded; bottom
+       corners flat so the bottom edge sits flush against the strip's
+       separator like a folder tab / bookmark. */
+    @apply inline-flex items-center gap-2 px-5 py-3
+           text-base font-medium rounded-t-md
+           text-muted-foreground bg-transparent
+           transition-all duration-150
+           hover:text-foreground hover:bg-muted/40
+           focus-visible:outline-none focus-visible:ring-2
+           focus-visible:ring-foreground/30 focus-visible:ring-inset;
+  }
+  /* Active tab — single source of truth for ALL .cms-tab usages
+     across the admin (product edit, variant detail, customer edit,
+     supplier orders, courier settings, etc). Reuse this class
+     everywhere by tagging the active element with
+     `aria-current="page"` — never duplicate this CSS.
+     Visual cues stacked to read as a bookmark/folder tab attached
+     to the content area below:
+       1. Darker bg lift (foreground tint) so it stands out against
+          the surrounding strip
+       2. Multi-layer drop shadow — close+tight + wider halo + inset
+          highlight on the top edge for the "raised tab" effect
+       3. Bold weight so the label reads as primary
+       4. `-mb-px` pulls the bottom edge down 1px so it overlaps
+          the strip's `border-b` line — the tab now visually SITS
+          ON the separator (its bg covers the line behind it),
+          closing the gap and selling the bookmark metaphor */
+  .cms-tab[aria-current="page"] {
+    @apply text-foreground font-semibold
+           bg-[hsl(var(--foreground)/0.12)] -mb-px
+           shadow-[0_4px_12px_rgba(0,0,0,0.12),0_2px_4px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.4)];
+  }
+  .cms-tab-count {
+    @apply rounded-full px-2 min-w-[20px] text-center
+           text-[12px] font-medium tabular-nums leading-[1.5]
+           bg-muted text-muted-foreground;
+  }
+  .cms-tab[aria-current="page"] .cms-tab-count {
+    @apply bg-foreground text-background;
+  }
+
+  /* --- Sidebar (collapsible sections) -------------------------------- */
+  /* The sidebar lives in a distinct background column (.cms-sidebar-column
+     on AdminLayout's <aside>). Sections are custom <div>s with a button
+     summary + a height-animated items container (NOT native <details>,
+     which snaps without animation). The wrapping AdminSidebar adds no
+     horizontal padding so individual elements control their own layout
+     and the open-section background can span the column edge-to-edge.
+
+     Layout principles:
+       - HEADERS (summary): padded x-3.5 from the column edges
+       - OPEN BAND: full column width (0 → 280px), darker text/lighter bg
+         than the surrounding sidebar so it reads as a separate zone
+       - ITEMS inside band: indented past the header text so the
+         nesting is visually obvious
+       - HEIGHT TRANSITION: grid-template-rows 0fr → 1fr (the only CSS-
+         only way to animate to/from `auto` on collapsible content)
+  */
+
+  /* Column background — darker than before so the sidebar reads as a
+     clearly distinct surface vs. the main content. */
+  .cms-sidebar-column {
+    background-color: hsl(var(--foreground) / 0.11);
+  }
+
+  .cms-sidebar-section {
+    /* No bg on the section itself; the open band carries its own. */
+  }
+
+  /* Section header — uppercase, full-width bar. Hover state spans the
+     entire sidebar width (no border-radius, no margin) so it matches
+     the open-band style and reads as a coherent strip rather than an
+     inset pill. */
+  .cms-sidebar-summary {
+    @apply w-full flex items-center justify-between gap-2 cursor-pointer
+           select-none
+           text-[13px] uppercase tracking-wider
+           text-foreground hover:bg-background/55
+           transition-colors;
+    padding: 0.75rem 0.875rem;  /* py-3 px-3.5 — a hair more vertical breathing room */
+  }
+  .cms-sidebar-section.is-muted .cms-sidebar-summary {
+    @apply text-foreground/50;
+  }
+  /* When a section is COLLAPSED and contains the currently-viewing page,
+     the header itself takes on the active-state visual: solid bg lift
+     + bold weight + left-edge accent stripe. This gives the user a
+     "you are here" cue without forcing the section open, and avoids
+     the half-collapsed active-item peek-through we got with native
+     grid-row animation on the items container. */
+  .cms-sidebar-summary.is-active {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-weight: 700;
+    box-shadow: inset 3px 0 0 hsl(var(--foreground));
+  }
+
+  /* Chevron — 14px SVG. Rotates 90° when its section is `.is-open`.
+     Larger than the previous 12px so it reads as a clear affordance. */
+  .cms-sidebar-chevron-wrap {
+    flex-shrink: 0;
+    color: hsl(var(--foreground) / 0.55);
+    display: inline-flex;
+  }
+  .cms-sidebar-chevron-wrap svg {
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .cms-sidebar-section.is-open .cms-sidebar-chevron-wrap svg {
+    transform: rotate(90deg);
+  }
+
+  /* ANIMATED HEIGHT CONTAINER. Uses the grid-template-rows 0fr → 1fr
+     trick so the height animates against the ACTUAL content height
+     (max-height with a fixed upper bound creates a perceptible "delay"
+     on close — the visible height doesn't start shrinking until
+     max-height drops below the natural content height).
+
+     Belt-and-suspenders clipping for the closed state:
+       - `overflow: hidden` on both wrap and items so anything past
+         the 0px grid row is cut off
+       - `opacity: 0` when closed so any sub-pixel residual (Chrome
+         can subpixel-round 0fr to a tiny non-zero physical pixel,
+         which lets the active link's white bg + accent stripe peek
+         through the collapsed boundary) is invisible
+     Both transition together so close still feels like a single
+     smooth motion. */
+  .cms-sidebar-items-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    overflow: hidden;
+    opacity: 0;
+    background-color: transparent;
+    pointer-events: none;
+    transition:
+      grid-template-rows 220ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 200ms cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .cms-sidebar-section.is-open .cms-sidebar-items-wrap {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    background-color: hsl(var(--background) / 0.5);
+    pointer-events: auto;
+  }
+
+  /* Items container — must have overflow:hidden + min-height:0 so its
+     grid row can collapse to 0px. Padding is ALWAYS applied; it gets
+     clipped by the parent's 0fr row + overflow:hidden when collapsed,
+     so there's no snap when toggling open/closed. */
+  .cms-sidebar-items {
+    overflow: hidden;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 4px 0;
+  }
+
+  /* Tab/link primitive. Full-width bar (no margin, no border-radius)
+     so its hover/active bg spans the entire sidebar column edge to
+     edge — matching the section-header and band-bg treatment for
+     visual coherence. Item text indent is controlled per-context:
+     top-level links use px-3.5; links inside an open section use a
+     deeper left padding for visual nesting. */
+  .cms-sidebar-link {
+    @apply flex items-center gap-2.5 w-full
+           text-[15px] leading-tight
+           text-foreground/80 hover:text-foreground hover:bg-background/65
+           transition-colors;
+    padding: 0.5rem 0.875rem;  /* py-2 px-3.5 by default */
+  }
+  /* Items inside an open section nest visually via a deeper left
+     padding so the sub-items read as children of the section header
+     (not as siblings). The +18px over the section-header padding
+     creates a clear hierarchical step when scanning. */
+  .cms-sidebar-items .cms-sidebar-link {
+    padding-left: 2rem;  /* 32px — section header is 14px; +18px decisive nest */
+  }
+  .cms-sidebar-icon {
+    @apply inline-flex items-center justify-center text-foreground/70;
+    width: 20px;
+    height: 20px;
+  }
+  .cms-sidebar-section.is-muted .cms-sidebar-link {
+    @apply text-foreground/55 hover:text-foreground;
+  }
+  /* Active link — full-width bar with solid bg lift + a left-edge
+     accent stripe via inset box-shadow (no layout shift). Scoped to
+     OPEN sections only: when a section is collapsed AND contains the
+     active route, the section HEADER carries the "you are here" cue
+     (.cms-sidebar-summary.is-active), so the child link's highlight
+     would be redundant — and worse, can peek through the collapsed
+     boundary as an unintended "weird highlight". */
+  .cms-sidebar-section.is-open .cms-sidebar-link.is-active {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-weight: 600;
+    box-shadow: inset 3px 0 0 hsl(var(--foreground));
+  }
+
+  /* Divider between Dashboard and the sectioned nav. Insets from the
+     column edges to mirror the summary inset. */
+  .cms-sidebar-divider {
+    height: 1px;
+    background-color: hsl(var(--foreground) / 0.1);
+    margin: 0.5rem 0.875rem;
+  }
+
+  /* "View live site" CTA at the bottom. Outlined button styling so
+     it reads as a distinct action, not a stealth link. */
+  .cms-sidebar-cta {
+    @apply flex items-center justify-between gap-2
+           rounded-md border border-foreground/25 bg-background
+           px-3 py-2.5 text-[15px] font-medium text-foreground
+           hover:border-foreground hover:bg-muted/40 transition-colors;
+  }
+
+  /* Hide BOTH scrollbars (vertical + horizontal) on the sidebar's
+     scroll container. The vertical one is hidden by design since the
+     content fits on most viewports once sections collapse; the
+     horizontal one was an artifact of overflow-x being auto'd when
+     overflow-y is auto — we hide it visually but also set overflow-x:
+     hidden in the markup so it never actually scrolls. */
+  .cms-sidebar-scroll {
+    scrollbar-width: none;          /* Firefox */
+    -ms-overflow-style: none;       /* IE / old Edge */
+  }
+  .cms-sidebar-scroll::-webkit-scrollbar {
+    display: none;                  /* WebKit / Blink */
+  }
+
+  /* Thin, unobtrusive scrollbar for the sticky sidebar. WebKit + Firefox. */
+  .cms-thin-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--foreground) / 0.15) transparent;
+  }
+  .cms-thin-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .cms-thin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .cms-thin-scrollbar::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--foreground) / 0.15);
+    border-radius: 999px;
+  }
+  .cms-thin-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--foreground) / 0.3);
+  }
+}

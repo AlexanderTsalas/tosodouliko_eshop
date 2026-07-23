@@ -1,0 +1,46 @@
+# Supabase project configuration.
+# Edit `project_id` once a real project is created.
+# Run `supabase init` then `supabase db push` to apply migrations.
+
+project_id = "kids_eshop"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 17
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/**"]
+jwt_expiry = 3600
+enable_signup = true
+# Required by the storefront's anonymous-customer flow (migration
+# 20260528000001_anonymous_auth_support.sql) and by loadtest contention
+# scenarios that spawn anonymous VUs. Production must also enable this
+# flag — in the Supabase dashboard for hosted projects, or via this same
+# config + `supabase config push` if linked.
+enable_anonymous_sign_ins = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[edge_runtime]
+enabled = true

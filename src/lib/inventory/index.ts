@@ -1,0 +1,1 @@
+export { decrementInventory } from "./decrementInventory";

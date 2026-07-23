@@ -1,0 +1,9 @@
+{
+  "framework": "nextjs",
+  "crons": [
+    { "path": "/api/cron/wishlist-advance", "schedule": "30 4 * * *" },
+    { "path": "/api/cron/reap-stale-drafts", "schedule": "0 4 * * *" },
+    { "path": "/api/cron/reap-orphan-media", "schedule": "15 4 * * *" },
+    { "path": "/api/cron/courier-directories", "schedule": "0 3 * * 0" }
+  ]
+}

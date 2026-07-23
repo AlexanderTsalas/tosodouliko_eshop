@@ -1,0 +1,31 @@
+-- =============================================================================
+-- One-shot NOTIFY to PostgREST to pick up everything from previously-applied
+-- migrations that forgot the schema-reload signal.
+--
+-- Background:
+--   Most ALTER TABLE … ADD COLUMN migrations omitted `NOTIFY pgrst,
+--   'reload schema'`. PostgREST caches the schema on boot and only
+--   refreshes when notified (or restarted). The result was a recurring
+--   class of "Could not find the X column of Y in the schema cache"
+--   errors after a deploy — the column existed in Postgres but
+--   PostgREST didn't know about it.
+--
+--   Specific known offenders (from audit):
+--     - 20260520000003 (variant weight_kg)
+--     - 20260430000035 (image variant_link)
+--     - 20260430000036 (attribute pricing rules)
+--     - 20260430000037 (split_listing)
+--     - 20260430000038 (auto_categories)
+--     - 20260430000039 (per-product split overrides)
+--     - 20260430000040 (vat_rates_and_cost)
+--
+-- Fix:
+--   This one-line migration forces a schema reload that covers ALL
+--   prior omissions in one shot. From now on, the convention is:
+--   every column-adding migration ends with `NOTIFY pgrst, 'reload
+--   schema';` so this kind of catch-up isn't needed again.
+--
+-- Idempotent + safe to re-run; NOTIFY without listeners is a no-op.
+-- =============================================================================
+
+NOTIFY pgrst, 'reload schema';

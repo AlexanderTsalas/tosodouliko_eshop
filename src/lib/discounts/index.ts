@@ -1,0 +1,1 @@
+export { validateDiscount } from "./validateDiscount";

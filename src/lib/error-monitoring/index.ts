@@ -1,0 +1,1 @@
+export { captureError } from "./captureError";
