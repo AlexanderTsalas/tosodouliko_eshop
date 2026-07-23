@@ -17,7 +17,7 @@ const NAV_LINKS = [
  */
 export default function MainNav() {
   return (
-    <nav className="hidden lg:flex items-center gap-8 xl:gap-10 text-[13px] uppercase tracking-widest font-bold text-ink">
+    <nav className="flex items-center gap-3.5 xl:gap-5 text-[12px] xl:text-[13px] uppercase tracking-wide font-bold text-ink whitespace-nowrap">
       {NAV_LINKS.map((link) => (
         <Link key={link.href} href={link.href} className="hover:text-terracotta py-2 transition-colors">
           {link.label}

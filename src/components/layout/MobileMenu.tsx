@@ -18,7 +18,7 @@ const NAV_LINKS = [
 ];
 
 /**
- * Mobile navigation — a hamburger trigger (lg:hidden) plus a slide-in drawer
+ * Mobile navigation — a hamburger trigger (xl:hidden) plus a slide-in drawer
  * containing search and the hardcoded primary links. Client component (open
  * state only — no more accordion since the nav is now flat).
  */
@@ -41,7 +41,7 @@ export default function MobileMenu() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="lg:hidden p-2 -ml-2 text-ink hover:text-terracotta transition-colors flex items-center justify-center"
+        className="xl:hidden p-2 -ml-2 text-ink hover:text-terracotta transition-colors flex items-center justify-center"
         aria-label={strings.categories.menuLabel}
       >
         <Menu className="w-6 h-6" />
@@ -49,7 +49,7 @@ export default function MobileMenu() {
 
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-[60] bg-ink/40 backdrop-blur-sm lg:hidden transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[60] bg-ink/40 backdrop-blur-sm xl:hidden transition-opacity duration-300 ${
           open ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={close}
@@ -58,7 +58,7 @@ export default function MobileMenu() {
 
       {/* Drawer panel — full-screen, on the site background colour */}
       <div
-        className={`fixed inset-0 z-[70] h-full w-full bg-background lg:hidden transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col ${
+        className={`fixed inset-0 z-[70] h-full w-full bg-background xl:hidden transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
         role="dialog"

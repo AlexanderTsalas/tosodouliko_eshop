@@ -100,7 +100,9 @@ export default async function Header() {
             </Link>
           </div>
 
-          <MainNav />
+          <div className="hidden xl:flex flex-1 min-w-0 justify-center border-x border-stone-taupe/15 mx-4 px-4">
+            <MainNav />
+          </div>
 
           <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <div className="hidden md:inline-flex">
